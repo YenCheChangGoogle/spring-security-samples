@@ -24,63 +24,57 @@ import org.springframework.security.oauth2.provider.token.store.JwtAccessTokenCo
 import java.lang.ref.SoftReference;
 import java.util.Arrays;
 
-/**
- * @作者 江南一点雨
- * @微信公众号 江南一点雨
- * @网站 http://www.itboyhub.com
- * @国际站 http://www.javaboy.org
- * @微信 a_java_boy
- * @GitHub https://github.com/lenve
- * @Gitee https://gitee.com/lenve
- */
-@EnableAuthorizationServer
+@EnableAuthorizationServer //開啟授權伺服器的自動化配置
 @Configuration
 public class AuthorizationServer extends AuthorizationServerConfigurerAdapter {
-    @Autowired
-    TokenStore tokenStore;
-    @Autowired
-    ClientDetailsService clientDetailsService;
-    @Autowired
-    AuthenticationManager authenticationManager;
-    @Autowired
-    PasswordEncoder passwordEncoder;
-    @Autowired
-    JwtAccessTokenConverter jwtAccessTokenConverter;
+  @Autowired
+  TokenStore tokenStore;
+  @Autowired
+  ClientDetailsService clientDetailsService;
+  @Autowired
+  AuthenticationManager authenticationManager;
+  @Autowired
+  PasswordEncoder passwordEncoder;
+  @Autowired
+  JwtAccessTokenConverter jwtAccessTokenConverter;
 
-    @Bean
-    AuthorizationServerTokenServices tokenServices() {
-        DefaultTokenServices services = new DefaultTokenServices();
-        services.setClientDetailsService(clientDetailsService);
-        services.setSupportRefreshToken(true);
-        services.setTokenStore(tokenStore);
-        services.setAccessTokenValiditySeconds(60 * 60 * 24 * 2);
-        services.setRefreshTokenValiditySeconds(60 * 60 * 24 * 7);
-        TokenEnhancerChain tokenEnhancerChain = new TokenEnhancerChain();
-        tokenEnhancerChain.setTokenEnhancers(Arrays.asList(jwtAccessTokenConverter));
-        services.setTokenEnhancer(tokenEnhancerChain);
-        return services;
-    }
+  //主要用來配置Token的一些基本信息
+  @Bean
+  AuthorizationServerTokenServices tokenServices() {
+    DefaultTokenServices services=new DefaultTokenServices();
+    services.setClientDetailsService(clientDetailsService);
+    services.setSupportRefreshToken(true);
+    services.setTokenStore(tokenStore);
+    services.setAccessTokenValiditySeconds(60*60*24*2);
+    services.setRefreshTokenValiditySeconds(60*60*24*7);
+    TokenEnhancerChain tokenEnhancerChain=new TokenEnhancerChain();
+    tokenEnhancerChain.setTokenEnhancers(Arrays.asList(jwtAccessTokenConverter));
+    services.setTokenEnhancer(tokenEnhancerChain);
+    return services;
+  }
 
-    @Override
-    public void configure(AuthorizationServerSecurityConfigurer security) throws Exception {
-        security.allowFormAuthenticationForClients();
-    }
+  //用來配置令牌端點的安全約束, 也就是這個端點誰能訪問, 誰不能訪問
+  @Override
+  public void configure(AuthorizationServerSecurityConfigurer security) throws Exception {
+    security.allowFormAuthenticationForClients();
+  }
 
-    @Override
-    public void configure(ClientDetailsServiceConfigurer clients) throws Exception {
-        clients.inMemory()
-                .withClient("javaboy")
-                .secret(passwordEncoder.encode("123"))
-                .resourceIds("res1")
-                .authorizedGrantTypes("password", "refresh_token")
-                .scopes("all")
-                .redirectUris("http://localhost:8082/index.html","http://localhost:8081/swagger-ui.html");
-    }
+  //用來配置客戶端的詳細信息
+  //授權伺服器要做兩方面的檢驗, 一方面是校驗客戶端, 另一方面則是校驗用戶
+  @Override
+  public void configure(ClientDetailsServiceConfigurer clients) throws Exception {
+    clients.inMemory()
+    .withClient("javaboy") //就是client_id的值
+    .secret(passwordEncoder.encode("123")) //就是client_secret的值
+    .resourceIds("res1")
+    .authorizedGrantTypes("password", "refresh_token")
+    .scopes("all") //勾選all acope
+    .redirectUris("http://localhost:8082/index.html", "http://localhost:8081/swagger-ui.html");
+  }
 
-    @Override
-    public void configure(AuthorizationServerEndpointsConfigurer endpoints) throws Exception {
-        endpoints
-                .authenticationManager(authenticationManager)
-                .tokenServices(tokenServices());
-    }
+  //用來配置令牌的訪問端點和令牌服務
+  @Override
+  public void configure(AuthorizationServerEndpointsConfigurer endpoints) throws Exception {
+    endpoints.authenticationManager(authenticationManager).tokenServices(tokenServices());
+  }
 }

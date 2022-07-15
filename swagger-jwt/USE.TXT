@@ -1,0 +1,26 @@
+資源伺服器入口點 127.0.0.1:8081/swagger-ui.html
+
+█
+
+目前 admin	角色帳密設定是 YCC / 123456
+目前 user	角色帳密設定是 ROSSI / 123456
+
+目前 client_id		設定是 javaboy
+目前 client_secret	設定是 123
+
+auth-server 與 user-server 系統的 SigningKey 目前都是設定是 【javaboy】
+
+█
+
+auth-server 授權認證伺服器 8080
+
+user-server 資源伺服器1 8081
+user-server 資源伺服器2 8082
+
+█
+
+/admin/hello
+需要admin角色的授權
+
+/hello
+需要user角色的授權
