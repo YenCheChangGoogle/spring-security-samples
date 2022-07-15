@@ -10,14 +10,6 @@ import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
-/**
- * @作者 江南一点雨
- * @公众号 江南一点雨
- * @微信号 a_java_boy
- * @GitHub https://github.com/lenve
- * @博客 http://wangsong.blog.csdn.net
- * @网站 http://www.javaboy.org
- */
 @Configuration
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Bean
@@ -38,8 +30,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 .formLogin()
                 .and()
-                .rememberMe()
-                .key("javaboy")
+                .rememberMe().key("javaboy").tokenValiditySeconds(60*30)
                 .and()
                 .csrf().disable();
     }
